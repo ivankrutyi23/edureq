@@ -5,22 +5,17 @@
 
 | | |
 |---|---|
-| **Повний застосунок (Render)** | https://edureg-app.onrender.com *(після розгортання, див. нижче)* · API-документація: `/docs` |
+| **Повний застосунок (Render)** | https://edureg-app.onrender.com · API-документація: `/docs` |
 | **Вітрина дизайну (GitHub Pages)** | https://ivankrutyi23.github.io/edureq/ — демо в рамці смартфона, гілка `Lab6-7`, без сервера |
 | **Стек** | React 18 · TypeScript · Vite · Framer Motion  /  Python 3.12 · FastAPI · SQLAlchemy · PostgreSQL · JWT |
 
-## Розгортання на Render в один клік
+## Розгортання
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ivankrutyi23/edureq)
-
-1. Натисніть кнопку, увійдіть у Render і підтвердіть **Apply** — [`render.yaml`](render.yaml) створить безкоштовну
-   базу PostgreSQL (`edureg-db`) та **один вебсервіс `edureg-app`**, який віддає і фронтенд, і API.
-2. Зачекайте 3–5 хвилин. Відкрийте адресу сервісу — запуститься повноцінний застосунок із базою даних.
-3. Перевірка API: `/api/v1/health`, документація: `/docs`.
+Система розгорнута на Render: https://edureg-app.onrender.com — один вебсервіс віддає і фронтенд, і API
+(`/docs` — документація), дані зберігаються в PostgreSQL. Режим «мобільні пристрої» (вибір телефона, поворот
+екрана): https://edureg-app.onrender.com/?showcase=1. Конфігурацію ресурсів описано в [`render.yaml`](render.yaml).
 
 > Безкоштовний тариф: сервіс «засинає» після 15 хв бездіяльності (перший запит ~1 хв), БД діє 30 днів.
-
-Фронтенд уже зібрано в `backend/static` (`cd frontend && npm run build:render`), тож додаткових кроків не потрібно.
 
 ## Локальний запуск
 
