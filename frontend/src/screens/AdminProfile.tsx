@@ -1,9 +1,10 @@
 // Екрани адміністратора (користувачі, модерація заходів) та профіль користувача
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, LogOut, RotateCcw, Search, ShieldCheck, Trash2, Users, WifiOff } from 'lucide-react';
+import { Eye, EyeOff, LogOut, RotateCcw, Search, Server, ShieldCheck, Trash2, Users, WifiOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { api } from '../api/endpoints';
-import { isOffline, setOffline, USING_MOCK } from '../api/client';
+import { isOffline, setOffline, usingMock } from '../api/client';
+import { apiState } from '../api/config';
 import { resetDb } from '../api/mockDb';
 import type { Role, User } from '../api/types';
 import { ErrorState, Page, PageHeader } from '../components/layout';
@@ -135,14 +136,25 @@ export function Profile() {
         <Badge kind={user.role === 'ADMIN' ? 'dark' : undefined}><ShieldCheck size={13} /> {roleLabel[user.role]}</Badge>
       </motion.div>
 
-      <h3 className="sect">Налаштування демо</h3>
-      <div className="card setting-list">
-        <div className="setting"><div><b><WifiOff size={15} style={{ verticalAlign: -2 }} /> Імітувати втрату мережі</b><small>Покаже, як застосунок обробляє помилки запитів</small></div>
-          <Switch on={off} onChange={(v) => { setOff(v); setOffline(v); toast(v ? 'Мережу вимкнено (імітація)' : 'Мережу відновлено'); }} label="Імітація втрати мережі" /></div>
-        <div className="setting"><div><b><RotateCcw size={15} style={{ verticalAlign: -2 }} /> Скинути демо-дані</b><small>Відновити початковий набір заходів</small></div>
-          <Button size="sm" variant="soft" onClick={() => setAsk(true)}>Скинути</Button></div>
-      </div>
-      <div className="about">EduReg · версія 0.1 · {USING_MOCK ? 'демо-режим (mock API)' : 'підключено до сервера'}</div>
+      {usingMock() ? (
+        <>
+          <h3 className="sect">Налаштування демо</h3>
+          <div className="card setting-list">
+            <div className="setting"><div><b><WifiOff size={15} style={{ verticalAlign: -2 }} /> Імітувати втрату мережі</b><small>Покаже, як застосунок обробляє помилки запитів</small></div>
+              <Switch on={off} onChange={(v) => { setOff(v); setOffline(v); toast(v ? 'Мережу вимкнено (імітація)' : 'Мережу відновлено'); }} label="Імітація втрати мережі" /></div>
+            <div className="setting"><div><b><RotateCcw size={15} style={{ verticalAlign: -2 }} /> Скинути демо-дані</b><small>Відновити початковий набір заходів</small></div>
+              <Button size="sm" variant="soft" onClick={() => setAsk(true)}>Скинути</Button></div>
+          </div>
+        </>
+      ) : (
+        <>
+          <h3 className="sect">З’єднання</h3>
+          <div className="card setting-list">
+            <div className="setting"><div><b><Server size={15} style={{ verticalAlign: -2 }} /> Підключено до сервера</b><small>{apiState().base}</small></div><Badge kind="info">онлайн</Badge></div>
+          </div>
+        </>
+      )}
+      <div className="about">EduReg · версія 1.0 · {usingMock() ? 'демо-режим (mock API)' : apiState().note}</div>
       <Button block variant="dark" icon={<LogOut size={18} />} onClick={logout}>Вийти з акаунта</Button>
       <Confirm open={ask} title="Скинути демо-дані?" text="Усі зміни (реєстрації, нові заходи) буде втрачено, а початкові дані — відновлено." confirmLabel="Скинути" onClose={() => setAsk(false)}
         onConfirm={() => { resetDb(); logout(); setAsk(false); }} />

@@ -1,9 +1,10 @@
 // Корінь клієнтського застосунку: заставка, маршрути за ролями, анімовані переходи між екранами
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import type { Role } from './api/types';
 import { Logo, Nav, StatusBar } from './components/layout';
+import { resolveApi } from './api/config';
 import { AdminEvents, AdminUsers, Profile } from './screens/AdminProfile';
 import { EventForm, OrgEvent, OrgHome, Scanner } from './screens/Organizer';
 import { EventDetail, EventsScreen, TicketsScreen } from './screens/Participant';
@@ -18,7 +19,7 @@ export interface AppProps {
 
 const HOME: Record<Role, string> = { PARTICIPANT: '/events', ORGANIZER: '/org', ADMIN: '/admin/users' };
 
-function Splash() {
+function Splash({ waiting }: { waiting?: boolean }) {
   return (
     <motion.div className="splash" exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
       <motion.div initial={{ scale: 0.3, rotate: -18, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 14 }}>
@@ -26,6 +27,11 @@ function Splash() {
       </motion.div>
       <motion.b initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>EduReg</motion.b>
       <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>Реєстрація на освітні заходи</motion.span>
+      {waiting && (
+        <motion.p className="splash__wait" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          Прокидаємо сервер… Безкоштовний хостинг може відповідати до хвилини під час першого запуску.
+        </motion.p>
+      )}
     </motion.div>
   );
 }
@@ -93,15 +99,28 @@ function Routed() {
   );
 }
 
+/** Визначає джерело даних (сервер / демо) до запуску решти застосунку; на час очікування показує заставку. */
+function ApiGate({ children }: { children: ReactNode }) {
+  const [ready, setReady] = useState(false);
+  const [waiting, setWaiting] = useState(false);
+  useEffect(() => {
+    resolveApi(() => setWaiting(true)).finally(() => setReady(true));
+  }, []);
+  if (!ready) return <Splash waiting={waiting} />;
+  return <>{children}</>;
+}
+
 export function AppRoot({ statusBar, autoRole }: AppProps) {
   return (
-    <AuthProvider autoRole={autoRole}>
-      <ToastProvider>
-        <div className="app" data-embedded={statusBar ? '1' : '0'}>
-          {statusBar && <StatusBar kind={statusBar} />}
-          <Routed />
-        </div>
-      </ToastProvider>
-    </AuthProvider>
+    <div className="app" data-embedded={statusBar ? '1' : '0'}>
+      {statusBar && <StatusBar kind={statusBar} />}
+      <ApiGate>
+        <AuthProvider autoRole={autoRole}>
+          <ToastProvider>
+            <Routed />
+          </ToastProvider>
+        </AuthProvider>
+      </ApiGate>
+    </div>
   );
 }

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { CalendarCheck2, ExternalLink, Laptop, QrCode, RotateCw, ScanLine, ShieldCheck, Smartphone, Tablet } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { forceMock, saveApiUrl, savedApiUrl } from '../api/config';
 import { Logo } from '../components/layout';
 import { byId, DEVICES, type Device } from './devices';
 
@@ -66,7 +67,22 @@ export function DeviceShowcase() {
   const [devId, setDevId] = useState('iphone15');
   const [landscape, setLandscape] = useState(false);
   const [start, setStart] = useState<Start>('guest');
+  const [apiInfo, setApiInfo] = useState<{ mode: string; note: string } | null>(null);
+  const [url, setUrl] = useState(savedApiUrl());
+  const [rk, setRk] = useState(0); // змінюється, щоб перезавантажити застосунок у рамці
   const dev = byId(devId);
+
+  // Застосунок у рамці повідомляє, який режим даних він обрав (сервер чи демо)
+  useEffect(() => {
+    const f = (e: MessageEvent) => {
+      if (e.data?.type === 'edureg-api') setApiInfo({ mode: e.data.mode, note: e.data.note });
+    };
+    window.addEventListener('message', f);
+    return () => window.removeEventListener('message', f);
+  }, []);
+  const reload = () => { setApiInfo(null); setRk((k) => k + 1); };
+  const connect = () => { saveApiUrl(url.trim() || null); reload(); };
+  const demo = () => { forceMock(); setUrl(''); reload(); };
   const phoneLike = dev.kind !== 'laptop';
 
   useEffect(() => { if (!phoneLike) setLandscape(false); }, [phoneLike]);
@@ -114,6 +130,16 @@ export function DeviceShowcase() {
           </div>
         </div>
 
+        <div className="ctl">
+          <h3>Джерело даних</h3>
+          <div className={`apibadge ${apiInfo?.mode === 'server' ? 'apibadge--server' : ''}`}><i /> {apiInfo?.note ?? 'Визначення режиму…'}</div>
+          <div className="apirow">
+            <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://edureg-api.onrender.com" aria-label="Адреса сервера" />
+            <button onClick={connect}>Підключити</button>
+            <button className="ghost" onClick={demo}>Демо</button>
+          </div>
+        </div>
+
         <ul className="feat">
           <li><CalendarCheck2 size={18} /> Пошук і реєстрація на заходи</li>
           <li><QrCode size={18} /> Персональний QR-квиток</li>
@@ -128,7 +154,7 @@ export function DeviceShowcase() {
       </aside>
 
       <section className="showcase__stage">
-        <Frame dev={dev} landscape={landscape} src={src} key={start} />
+        <Frame dev={dev} landscape={landscape} src={src} key={`${start}-${rk}`} />
         <div className="caption">{dev.name} · {landscape && phoneLike ? `${dev.h}×${dev.w}` : `${dev.w}×${dev.h}`}</div>
       </section>
     </div>
