@@ -1,0 +1,30 @@
+# Blueprint для Render: https://render.com/deploy?repo=https://github.com/ivankrutyi23/edureq
+# Створює безкоштовну базу PostgreSQL і безкоштовний вебсервіс із FastAPI.
+databases:
+  - name: edureg-db
+    plan: free
+    databaseName: edureg
+    user: edureg
+
+services:
+  - type: web
+    name: edureg-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATABASE_URL
+        fromDatabase:
+          name: edureg-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://ivankrutyi23.github.io,http://localhost:5173,http://localhost:4173
+      - key: SEED_DEMO
+        value: "true"
