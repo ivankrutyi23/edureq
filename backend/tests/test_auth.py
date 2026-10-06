@@ -75,3 +75,16 @@ def test_health_and_unknown_route(client):
     assert r.status_code == 200 and r.json()["status"] == "ok"
     r = client.get("/api/v1/nope")
     assert r.status_code == 404 and r.json() == {"status": 404, "message": "Ресурс не знайдено"}
+
+
+def test_frontend_is_served_but_api_404_stays_json(client):
+    from app.main import STATIC_DIR
+    if not (STATIC_DIR / "index.html").is_file():
+        return  # статичний фронтенд не зібрано – пропускаємо
+    r = client.get("/")
+    assert r.status_code == 200 and "<div id=\"root\">" in r.text
+    assert client.get("/config.js").status_code == 200
+    assert client.get("/some/spa/route").status_code == 200  # маршрут клієнта віддає index.html
+    r = client.get("/api/v1/unknown")
+    assert r.status_code == 404 and r.json()["status"] == 404
+    assert client.get("/docs").status_code == 200

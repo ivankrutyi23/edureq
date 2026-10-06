@@ -5,23 +5,22 @@
 
 | | |
 |---|---|
-| **Демо (фронтенд)** | https://ivankrutyi23.github.io/edureq/ |
-| **API (Render)** | https://edureg-api.onrender.com/docs *(після розгортання, див. нижче)* |
+| **Повний застосунок (Render)** | https://edureg-app.onrender.com *(після розгортання, див. нижче)* · API-документація: `/docs` |
+| **Вітрина дизайну (GitHub Pages)** | https://ivankrutyi23.github.io/edureq/ — демо в рамці смартфона, гілка `Lab6-7`, без сервера |
 | **Стек** | React 18 · TypeScript · Vite · Framer Motion  /  Python 3.12 · FastAPI · SQLAlchemy · PostgreSQL · JWT |
 
-## Розгортання в один клік
+## Розгортання на Render в один клік
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ivankrutyi23/edureq)
 
-1. Натисніть кнопку, увійдіть у Render і підтвердіть **Apply** — файл [`render.yaml`](render.yaml) створить
-   безкоштовну базу PostgreSQL (`edureg-db`) та вебсервіс `edureg-api` (FastAPI).
-2. Зачекайте 3–5 хвилин, поки завершиться збирання. Перевірка: `https://edureg-api.onrender.com/api/v1/health`.
-3. Усе. Сайт на GitHub Pages **сам підключається до сервера** (адреса задана в `docs/config.js`),
-   а якщо сервер недоступний — працює в демо-режимі. Якщо Render видав іншу адресу (ім’я сервісу зайняте) —
-   вставте її в поле «Джерело даних» на демо-сторінці або змініть `apiUrl` у `docs/config.js`.
+1. Натисніть кнопку, увійдіть у Render і підтвердіть **Apply** — [`render.yaml`](render.yaml) створить безкоштовну
+   базу PostgreSQL (`edureg-db`) та **один вебсервіс `edureg-app`**, який віддає і фронтенд, і API.
+2. Зачекайте 3–5 хвилин. Відкрийте адресу сервісу — запуститься повноцінний застосунок із базою даних.
+3. Перевірка API: `/api/v1/health`, документація: `/docs`.
 
-> Безкоштовний тариф Render: сервіс «засинає» після 15 хвилин бездіяльності (перший запит ~ 1 хв — застосунок
-> показує повідомлення про це), безкоштовна БД діє 30 днів. Для оцінювання роботи цього достатньо.
+> Безкоштовний тариф: сервіс «засинає» після 15 хв бездіяльності (перший запит ~1 хв), БД діє 30 днів.
+
+Фронтенд уже зібрано в `backend/static` (`cd frontend && npm run build:render`), тож додаткових кроків не потрібно.
 
 ## Локальний запуск
 
@@ -34,18 +33,19 @@ docker compose up --build          # API: http://localhost:8000, докумен�
 cd frontend
 npm install
 npm run dev                         # http://localhost:5173/?api=http://localhost:8000
+npm run build:render                # збірка фронтенду в backend/static (її віддає FastAPI)
 ```
 
 Без Docker: `pip install -r requirements-dev.txt`, `uvicorn app.main:app --reload` (за замовчуванням SQLite).
-Тести: `cd backend && pytest` (35 тестів).
+Тести: `cd backend && pytest` (36 тестів).
 
 Демо-акаунти (пароль `demo1234`): `koval@edureg.test` — учасник, `melnyk@edureg.test` — організатор, `admin@edureg.test` — адміністратор.
 
 ## Архітектура
 
 ```
-React (GitHub Pages)  ──HTTPS/JSON, JWT──▶  FastAPI (Render)  ──SQL──▶  PostgreSQL
-                                             routers → services → repositories
+Браузер ──HTTPS──▶  FastAPI (Render): React-фронтенд + REST API /api/v1  ──SQL──▶  PostgreSQL
+                    routers → services → repositories
 ```
 
 ```
@@ -70,4 +70,4 @@ backend/app
 | Гілка | Зміст |
 |---|---|
 | `Lab6-7` | фронтенд (демо-режим із вбудованим mock API) |
-| `Lab8-10` | бекенд FastAPI + PostgreSQL, підключення фронтенду, розгортання на Render |
+| `Lab8-10` | бекенд FastAPI + PostgreSQL, фронтенд у складі сервісу, розгортання на Render |

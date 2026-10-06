@@ -1,5 +1,5 @@
 // Вибір режиму відображення:
-//  – ?app=1, вікно вужче за 820 px або перегляд усередині iframe → власне застосунок;
+//  – ?app=1, вікно вужче за 820 px, перегляд усередині iframe або режим app (Render) → власне застосунок;
 //  – інакше (великий екран) → демонстраційна оболонка з вибором пристрою.
 import { useEffect, useState } from 'react';
 import type { Role } from './api/types';
@@ -20,7 +20,9 @@ export default function App() {
   const params = new URLSearchParams(window.location.search);
   const narrow = useNarrow();
   const embedded = window.top !== window;
-  const isApp = params.get('app') === '1' || embedded || narrow;
+  // На Render (config.js: mode 'app') одразу відкривається застосунок; ?showcase=1 повертає демо-оболонку
+  const appMode = window.EDUREG_CONFIG?.mode === 'app' && params.get('showcase') !== '1';
+  const isApp = params.get('app') === '1' || embedded || narrow || appMode;
 
   if (!isApp) return <DeviceShowcase />;
   const sb = params.get('sb');

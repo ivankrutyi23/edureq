@@ -1,4 +1,5 @@
 // Визначення джерела даних: справжній сервер (FastAPI) або вбудований демо-режим (mock).
+// На Render фронтенд і API працюють на одному хості: у config.js задано відносну адресу '/api/v1'.
 // Пріоритет адреси сервера:
 //   1) параметр URL ?api=https://…  (api=off – примусово демо; api=reset – скинути збережене);
 //   2) значення, збережене в localStorage (поле «Сервер» у демо-оболонці);
@@ -16,7 +17,7 @@ export interface ApiState {
 
 declare global {
   interface Window {
-    EDUREG_CONFIG?: { apiUrl?: string };
+    EDUREG_CONFIG?: { apiUrl?: string; mode?: 'app' | 'showcase' };
   }
 }
 
@@ -73,10 +74,11 @@ export async function resolveApi(onWaiting?: () => void): Promise<ApiState> {
     state = { mode: 'mock', base: '', note: 'Демо-режим (дані в браузері)' };
   } else {
     const timer = setTimeout(() => onWaiting?.(), 3000);
-    const ok = await ping(c.url, 60_000);
+    const abs = new URL(c.url, window.location.origin).toString().replace(/\/$/, ''); // підтримка відносної адреси /api/v1
+    const ok = await ping(abs, 60_000);
     clearTimeout(timer);
     state = ok
-      ? { mode: 'server', base: c.url, note: `Сервер: ${new URL(c.url).host}` }
+      ? { mode: 'server', base: abs, note: `Сервер: ${new URL(abs).host}` }
       : { mode: 'mock', base: '', note: 'Сервер недоступний – демо-режим' };
   }
   try { window.parent?.postMessage({ type: 'edureg-api', ...state }, '*'); } catch { /* поза iframe */ }
