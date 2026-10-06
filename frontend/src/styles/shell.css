@@ -1,0 +1,72 @@
+/* ===== Демонстраційна оболонка з рамками пристроїв ===== */
+.showcase { height: 100%; display: grid; grid-template-columns: minmax(360px, 460px) 1fr; background:
+  radial-gradient(900px 500px at 85% 10%, rgba(159, 232, 112, 0.35), transparent 60%),
+  radial-gradient(700px 500px at 60% 100%, rgba(205, 255, 173, 0.6), transparent 60%), #f6faf2; overflow: hidden; }
+.showcase__panel { padding: 36px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(10px); border-right: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 800; letter-spacing: -0.04em; color: var(--forest); }
+.showcase h1 { font-size: clamp(30px, 3.2vw, 44px); line-height: 1.02; font-weight: 800; letter-spacing: -0.045em; color: var(--ink); }
+.showcase h1 em { font-style: normal; background: linear-gradient(transparent 58%, var(--lime) 58%); }
+.lead { color: var(--muted); line-height: 1.55; font-size: 16px; }
+.ctl h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; }
+.ctl--row { display: flex; gap: 22px; flex-wrap: wrap; }
+.devlist { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.devbtn { position: relative; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--line); font-size: 13px; font-weight: 700; color: var(--forest); text-align: left; flex-wrap: wrap; transition: box-shadow 0.2s; }
+.devbtn:hover { box-shadow: inset 0 0 0 1.5px var(--forest); }
+.devbtn > * { position: relative; z-index: 1; }
+.devbtn small { width: 100%; padding-left: 25px; color: var(--muted); font-weight: 600; margin-top: -4px; }
+.devbtn--on { box-shadow: none; }
+.devbtn__pill { position: absolute !important; inset: 0; border-radius: 16px; background: var(--lime); z-index: 0 !important; }
+.rotbtn { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px; border-radius: var(--pill); background: var(--forest); color: var(--lime); font-weight: 700; font-size: 14px; }
+.rotbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.starts { display: flex; gap: 6px; flex-wrap: wrap; }
+.starts button { min-height: 40px; padding: 0 14px; border-radius: var(--pill); background: #fff; box-shadow: inset 0 0 0 1.5px var(--line); font-weight: 700; font-size: 13px; color: var(--forest); }
+.starts button.on { background: var(--lime); box-shadow: none; }
+.feat { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.feat li { display: flex; align-items: center; gap: 12px; font-weight: 600; color: var(--forest); font-size: 15px; }
+.feat li svg { flex: none; padding: 8px; box-sizing: content-box; width: 18px; height: 18px; border-radius: 12px; background: var(--lime); }
+.openrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: auto; padding-top: 6px; }
+.open { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: var(--pill); background: var(--lime); color: var(--forest); font-weight: 700; text-decoration: none; }
+.open:hover { background: #8fdd5f; }
+.qr { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; background: #fff; border-radius: 16px; box-shadow: var(--shadow-sm); }
+.qr small { font-size: 10px; font-weight: 700; color: var(--muted); }
+
+.showcase__stage { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; }
+.stage { flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.scaler { position: relative; }
+.caption { padding: 4px 0 14px; font-weight: 700; font-size: 13px; color: var(--muted); }
+
+/* Корпус пристрою */
+.device { position: relative; background: #0f1311; box-shadow: 0 40px 90px rgba(22, 51, 0, 0.35), 0 0 0 2px #2a2f2a inset, 0 0 0 1px #000; }
+.device--android { background: #1b1f1c; }
+.device--tablet { background: #1a1d1b; }
+.device--laptop { background: #d9ddd8; box-shadow: 0 30px 70px rgba(22, 51, 0, 0.3), 0 0 0 1px #b7bcb5 inset; display: flex; flex-direction: column; }
+.device__screen { position: relative; overflow: hidden; background: #fff; flex: 1; }
+.device--phone .device__screen, .device--tablet .device__screen { position: absolute; inset: 0; margin: 0 !important; }
+.device .device__screen iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+.device--phone, .device--tablet { padding: 0; }
+.device--phone .device__screen, .device--tablet .device__screen { inset: var(--b, 12px); }
+.notch { position: absolute; background: #000; z-index: 20; pointer-events: none; }
+.notch--island { top: 11px; left: 50%; width: 120px; height: 34px; border-radius: 20px; translate: -50% 0; }
+.notch--land { display: none; }
+.notch--punch { top: 12px; left: 50%; width: 15px; height: 15px; border-radius: 50%; translate: -50% 0; }
+
+.btn-side { position: absolute; width: 4px; background: #2a2f2a; border-radius: 2px; }
+.btn-side--a { right: -3px; top: 160px; height: 80px; }
+.btn-side--b { left: -3px; top: 130px; height: 50px; }
+.browserbar { height: 36px; display: flex; align-items: center; gap: 7px; padding: 0 14px; background: #eceee9; border-radius: 18px 18px 0 0; flex: none; }
+.browserbar i { width: 11px; height: 11px; border-radius: 50%; background: #c4c9c1; }
+.browserbar i:nth-child(1) { background: #ff6b5e; }
+.browserbar i:nth-child(2) { background: #ffc13d; }
+.browserbar i:nth-child(3) { background: #3ecf5a; }
+.browserbar span { margin-left: 14px; flex: 1; max-width: 460px; background: #fff; border-radius: var(--pill); font-size: 12px; padding: 5px 14px; color: var(--muted); }
+.device--laptop .device__screen { margin: 0 !important; border-radius: 0 0 8px 8px !important; }
+.laptop-base { position: absolute; left: 50%; bottom: -16px; translate: -50% 0; height: 16px; background: linear-gradient(#cfd3cd, #b5bab3); border-radius: 0 0 22px 22px; }
+
+/* Вузькі «десктопи»: панель зверху */
+@media (max-width: 1100px) {
+  .showcase { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow-y: auto; }
+  .showcase__panel { border-right: 0; border-bottom: 1px solid var(--line); padding: 20px 24px; }
+  .feat, .lead { display: none; }
+  .showcase__stage { min-height: 760px; }
+  .openrow { margin-top: 0; }
+}
